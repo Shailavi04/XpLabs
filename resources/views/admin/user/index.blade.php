@@ -90,8 +90,9 @@
                                 @enderror
                             </div>
 
-                             <div class="col-4">
-                                <label for="phone_number" class="form-label">Mobile<span style="color: red;">*</span></label>
+                            <div class="col-4">
+                                <label for="phone_number" class="form-label">Mobile<span
+                                        style="color: red;">*</span></label>
                                 <input class="form-control" type="text" name="phone_number" id="phone_number" required
                                     placeholder="Enter your mobile">
                                 @error('phone_number')
@@ -99,7 +100,7 @@
                                 @enderror
                             </div>
 
-                           
+
                             <div class="col-4">
                                 <label for="email" class="form-label">Email<span style="color: red;">*</span></label>
                                 <input class="form-control" type="email" name="email" id="email"
@@ -109,7 +110,7 @@
                                 @enderror
                             </div>
 
-                       
+
                             <div class="col-4">
                                 <label for="password" class="form-label">Password<span style="color: red;">*</span></label>
                                 <input class="form-control" type="password" name="password" id="password"
@@ -132,7 +133,7 @@
                                 @enderror
                             </div>
 
-                           
+
                             <div class="col-4">
                                 <label for="profile_image" class="form-label">Profile Image</label>
                                 <input class="form-control" type="file" name="profile_image" id="profile_image"
@@ -162,7 +163,7 @@
 
     <div class="modal fade" id="editRoleModal" tabindex="-1" aria-labelledby="editRoleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
-            <form id="editRoleForm" method="POST">
+            <form id="editRoleForm" method="POST" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="user_id" id="edit_user_id">
 
@@ -172,38 +173,48 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
+                        <div class="row g-3">
 
-                        <div class="mb-3">
-                            <label>Name</label>
-                            <input type="text" name="name" id="edit_name" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label>Phone Number</label>
-                            <input type="text" name="phone_number" id="edit_phone_number" class="form-control">
-                        </div>
+                            <div class="col-4">
+                                <label>Name <span style="color: red;">*</span></label>
+                                <input type="text" name="name" id="edit_name" class="form-control" required>
+                            </div>
 
-                        <div class="mb-3">
-                            <label>Email</label>
-                            <input type="email" name="email" id="edit_email" class="form-control">
-                        </div>
+                            <div class="col-4">
+                                <label>Phone Number <span style="color: red;">*</span></label>
+                                <input type="text" name="phone_number" id="edit_phone_number" class="form-control"
+                                    required>
+                            </div>
 
-                        <div class="mb-3">
-                            <label>Role</label>
-                            <select name="role" id="edit_role" class="form-select">
-                                @foreach ($roles as $item)
-                                    <option value="{{ $item->id }}">{{ $item->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                            <div class="col-4">
+                                <label>Email <span style="color: red;">*</span></label>
+                                <input type="email" name="email" id="edit_email" class="form-control" required>
+                            </div>
 
-                        <div class="mb-3">
-                            <label>Status</label>
-                            <select name="status" id="edit_status" class="form-select">
-                                <option value="1">Active</option>
-                                <option value="0">Inactive</option>
-                            </select>
-                        </div>
+                            <div class="col-4">
+                                <label>Role <span style="color: red;">*</span></label>
+                                <select name="role" id="edit_role" class="form-select" required>
+                                    @foreach ($roles as $item)
+                                        <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
+                            <div class="col-4">
+                                <label>Status <span style="color: red;">*</span></label>
+                                <select name="status" id="edit_status" class="form-select" required>
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                            </div>
+
+                            <div class="col-4">
+                                <label>Profile Image</label>
+                                <input type="file" name="profile_image" id="edit_profile_image" class="form-control"
+                                    accept="image/*">
+                            </div>
+
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-orange">Update User</button>
@@ -258,7 +269,6 @@
                     ]
                 });
 
-                // Role filter click event
                 $('.role-filter').on('click', function() {
                     var roleId = $(this).data('role');
                     $('#filterRole').val(roleId); // hidden input update
@@ -268,9 +278,9 @@
 
 
 
-            // Handle edit button click inside DataTable
-            $('#user-table tbody').on('click', '.edit-user-btn', function() {
+            $('#user-table').on('click', '.edit-user-btn', function() {
                 var userId = $(this).data('id');
+
 
                 $.ajax({
                     url: '/users/edit/' + userId,
@@ -281,20 +291,24 @@
                         $('#edit_user_id').val(user.id);
                         $('#edit_name').val(user.name);
                         $('#edit_email').val(user.email);
-                        $('#edit_role').val(user.role_id);
+                        $('#edit_role').val(user.role_id); // must match <option value="id">
                         $('#edit_phone_number').val(user.phone_number);
                         $('#edit_status').val(user.status);
 
                         // Set form action
                         $('#editRoleForm').attr('action', '/users/update/' + user.id);
 
-                        $('#editRoleModal').modal('show');
+                        // Show modal using Bootstrap 5
+                        var editModal = new bootstrap.Modal(document.getElementById(
+                            'editRoleModal'));
+                        editModal.show();
                     },
                     error: function() {
                         alert('Failed to fetch user data.');
                     }
                 });
             });
+
 
         });
     </script>

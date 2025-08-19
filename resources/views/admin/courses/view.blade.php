@@ -77,7 +77,7 @@
                             <div class="d-flex align-items-center gap-2">
                                 <i class="fas fa-clock text-primary fs-5"></i>
                                 <div class="d-flex flex-column">
-                                    <span class="fs-6 fw-semibold">{{ $course->duration }} month</span>
+                                    <span class="fs-6 fw-semibold">{{ $course->duration }} hours</span>
                                     <small class="text-muted">course duration</small>
                                 </div>
                             </div>
@@ -97,7 +97,7 @@
 
         <div class="row mt-2 g-4">
             <div class="col-md-4">
-                <div class="card custom-card h-100">
+                <div class="card custom-card h-50">
                     <div class="card-header">
                         <h5>Students Enrolled</h5>
                     </div>
@@ -106,15 +106,15 @@
                             <ul class="list-group list-group-flush">
                                 @foreach ($student as $s)
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <span>{{ $s->name }}</span>
+                                        <span>{{ $s->student_name }}</span>
                                         <small class="text-muted">
-                                            {{ $s->enrolled_at?? 'N/A' }}
+                                            {{ $s->enrolled_at ?? 'N/A' }}
                                         </small>
                                     </li>
                                 @endforeach
                             </ul>
                         @else
-                        <p>No students enrolled yet</p>
+                            <p>No students enrolled yet</p>
                         @endif
 
                     </div>
@@ -126,23 +126,18 @@
                     <div class="card-header">
                         <h5>Course Curriculum</h5>
                     </div>
-                    <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                    <div class="card-body" style="max-height: 100%; overflow-y: auto;">
                         @if ($curriculumHtml)
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Course Curriculum</h5>
-                                </div>
-                                <div class="card-body">
-                                    {!! $curriculumHtml !!}
-                                </div>
-                            </div>
+                            <ul class="list-group list-group-flush">
+                                {!! $curriculumHtml !!}
+                            </ul>
                         @else
                             <p class="text-muted">No curriculum available.</p>
                         @endif
-
                     </div>
                 </div>
             </div>
+
 
         </div>
 

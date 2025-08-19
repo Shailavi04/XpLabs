@@ -67,10 +67,6 @@ class UserControlller extends Controller
 
         return redirect()->route('users.index')
             ->with('success', 'User Created Successfully!');
-
-
-
-            
     }
 
 
@@ -131,35 +127,34 @@ class UserControlller extends Controller
             // $row['image'] = asset('/uploads/classes/' . ($class->profile_image ?: 'default.png'));
 
             $deleteUrl = route('classes.destroy', $user->id);
-
             $row['action'] = '
-    <div class="btn-group">
-        <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M8 5.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm0 1.5a1.5 1.5 0 1 1 0 3 
-                    1.5 1.5 0 0 1 0-3zm0 4.5a1.5 1.5 0 1 1 0 3 
-                    1.5 1.5 0 0 1 0-3z"/>
-            </svg>
-        </button>
-        <ul class="dropdown-menu">
-            <li>
-   
- <a class="dropdown-item edit-user-btn" href="javascript:void(0);" data-id="' . $user->id . '">
-                <i class="fas fa-edit me-1 text-primary"></i> Edit
+<div class="btn-group">
+    <button type="button" class="btn btn-sm btn-primary dropdown-toggle" 
+        data-bs-toggle="dropdown" aria-expanded="false" 
+        style="padding: 0.25rem 0.5rem;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 5.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm0 1.5a1.5 1.5 0 1 1 0 3 
+                1.5 1.5 0 0 1 0-3zm0 4.5a1.5 1.5 0 1 1 0 3 
+                1.5 1.5 0 0 1 0-3z"/>
+        </svg>
+    </button>
+    <ul class="dropdown-menu">
+        <li>
+            <a class="dropdown-item edit-user-btn" href="javascript:void(0);" 
+               data-id="' . $user->id . '">
+               <i class="fas fa-edit me-1 text-primary"></i> Edit
             </a>
-
-            </li>
-            <li>
-                <form id="delete-form-' . $user->id . '" action="' . route('classes.destroy', $user->id) . '" method="POST" style="display: none;">
-                    ' . csrf_field() . '
-                </form>
-                <a href="javascript:void(0);" class="dropdown-item text-danger" onclick="confirmDelete(' . $user->id . ')">
-                    <i class="fas fa-trash-alt me-1"></i> Delete
-                </a>
-            </li>
-        </ul>
-    </div>';
-
+        </li>
+        <li>
+            <form id="delete-form-' . $user->id . '" action="' . route('classes.destroy', $user->id) . '" method="POST" style="display: none;">
+                ' . csrf_field() . '
+            </form>
+            <a href="javascript:void(0);" class="dropdown-item text-danger" onclick="confirmDelete(' . $user->id . ')">
+                <i class="fas fa-trash-alt me-1"></i> Delete
+            </a>
+        </li>
+    </ul>
+</div>';
             $data[] = $row;
         }
 
@@ -174,31 +169,50 @@ class UserControlller extends Controller
 
     public function edit($id)
     {
+        $user = User::with('role')->findOrFail($id);
 
-        $user = User::with('role')->where('id', $id)->first();
-
-        return response()->json(['user' =>  $user]);
+        return response()->json([
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role_id' => $user->role ? $user->role->id : null,
+                'phone_number' => $user->phone_number,
+                'status' => $user->status
+            ]
+        ]);
     }
-
 
 
     public function update(Request $request, $id)
     {
-
-
-
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $id,
             'role' => 'required|exists:roles,id',
             'status' => 'required|boolean',
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         $user = User::findOrFail($id);
+
         $user->name = $request->name;
         $user->email = $request->email;
         $user->role_id = $request->role;
         $user->status = $request->status;
+
+        if ($request->hasFile('profile_image')) {
+            $file = $request->file('profile_image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/users'), $filename);
+
+            if ($user->profile_image && file_exists(public_path('uploads/users/' . $user->profile_image))) {
+                unlink(public_path('uploads/users/' . $user->profile_image));
+            }
+
+            $user->profile_image = $filename;
+        }
+
         $user->save();
 
         return redirect()->back()->with('success', 'User updated successfully.');

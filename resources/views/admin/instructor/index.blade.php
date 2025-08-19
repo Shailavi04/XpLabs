@@ -130,10 +130,10 @@
                                 <textarea name="bio" class="form-control" rows="3"></textarea>
                             </div>
 
-                            <div class="col-md-12">
+                            {{-- <div class="col-md-12">
                                 <label class="form-label">Profile Image</label>
                                 <input type="file" name="profile_image" class="form-control" accept="image/*">
-                            </div>
+                            </div> --}}
 
                         </div>
                     </div>
@@ -216,11 +216,11 @@
                                 <textarea name="bio" id="edit-bio" class="form-control" rows="3"></textarea>
                             </div>
 
-                            <div class="col-md-12">
+                            {{-- <div class="col-md-12">
                                 <label class="form-label">Profile Image</label>
                                 <input type="file" name="profile_image" class="form-control" accept="image/*">
                                 <div id="current-edit-image" class="mt-2"></div>
-                            </div>
+                            </div> --}}
 
                         </div>
                     </div>

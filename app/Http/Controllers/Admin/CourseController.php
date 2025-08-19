@@ -236,16 +236,6 @@ class CourseController extends Controller
     }
 
 
-
-
-    // public function edit($id)
-    // {
-    //     $course = Course::findOrFail($id);
-    //     $categories = Category::all();
-    //     return view('admin.courses.edit', compact('course', 'categories'));
-    // }
-
-
     public function edit($id)
     {
         $course = Course::with(['category', 'centers'])->find($id);
@@ -265,7 +255,7 @@ class CourseController extends Controller
             'success' => true,
             'course' => $course,
             'all_centers' => DB::table('centers')->select('id', 'name')->get(),
-            'user_centers' => $userCenters 
+            'user_centers' => $userCenters
         ]);
     }
 
@@ -274,7 +264,6 @@ class CourseController extends Controller
 
     public function update(Request $request, $id)
     {
-        // dd($request->all());
         $user = auth()->user();
         $course = Course::findOrFail($id);
 
@@ -341,24 +330,21 @@ class CourseController extends Controller
             ->where('enrollment.course_id', $id)
             ->count();
 
+
+
         $student = DB::table('enrollment')
-            ->join('courses', 'enrollment.course_id', '=', 'courses.id')
-            ->join('students', 'enrollment.student_id', '=', 'students.id')
-            ->where('courses.id', $id)
+            ->join('students', 'enrollment.student_icard', '=', 'students.icard')
+            ->leftJoin('users', 'students.user_id', '=', 'users.id')
+            ->where('enrollment.course_id', $id)
             ->select(
-                'courses.name as course_name',
-                'students.name as name',
+                'users.id as user_id',
+                'users.name as student_name',
+                'users.email as student_email',
+                'students.icard',
+                'students.image as student_image',
                 DB::raw("DATE_FORMAT(enrollment.created_at, '%Y-%m-%d') as enrolled_at")
             )
             ->get();
-
-        //                                 foreach ($student as $s){
-
-        // dd($s->name);
-
-        //                                 }
-
-
 
 
         // Prepare curriculum HTML
@@ -417,7 +403,7 @@ class CourseController extends Controller
 
     public function studentsList($id)
     {
-        $course = Course::with('enrollments.student')->findOrFail($id);
+        $course = Course::with(['enrollments.student.user'])->findOrFail($id);
         return view('admin.courses.students-list', compact('course'));
     }
 
@@ -425,13 +411,13 @@ class CourseController extends Controller
     {
         $course = Course::findOrFail($id);
 
-        $query = Enrollment::with('student')->where('course_id', $id);
+        $query = Enrollment::with('student.user')->where('course_id', $id);
 
         $totalRecords = $query->count();
 
         if (!empty($request->get('search')['value'])) {
             $search = $request->get('search')['value'];
-            $query->whereHas('student', function ($q) use ($search) {
+            $query->whereHas('student.user', function ($q) use ($search) {
                 $q->where('name', 'like', "%$search%")
                     ->orWhere('email', 'like', "%$search%");
             });
@@ -446,12 +432,13 @@ class CourseController extends Controller
 
         $data = [];
         $i = $request->get('start') + 1;
+
         foreach ($enrollments as $enrollment) {
             $data[] = [
                 'DT_RowIndex' => $i++,
-                'name' => $enrollment->student->name,
-                'email' => $enrollment->student->email,
-                'mobile' => $enrollment->student->mobile ?? '-',
+                'name' => $enrollment->student->user->name ?? '-',
+                'email' => $enrollment->student->user->email ?? '-',
+                'mobile' => $enrollment->student->user->phone_number ?? '-',
                 'date' => $enrollment->created_at ? $enrollment->created_at->format('d-m-Y') : '-',
             ];
         }
