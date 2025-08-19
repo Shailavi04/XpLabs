@@ -1,0 +1,48 @@
+{
+    "Banner": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Banner Section",
+        "content": {
+            "heading": "text",
+            "subheading": "text",
+            "description": "textarea-rich",
+            "filter": {
+                "category_id": "text",
+                "search_placeholder": "text"
+            },
+            "button_text": "text",
+            "button_url": "text",
+            "rating": "text",
+            "review_text": "text",
+            "images": {
+                "main_image": {
+                    "label": "Main Image (Girl with Books)",
+                    "size": "600x800"
+                }
+            }
+        },
+        "element": {
+            "modal": true
+        }
+    },
+    "Vision": {
+        "builder": true,
+        "name": "Vision / Stats Section",
+        "content": {
+            "cards": {
+                "type": "repeater",
+                "fields": {
+                    "title": "text",
+                    "subtitle": "text"
+                }
+            },
+            "images": {
+                "icon": {
+                    "label": "icon",
+                    "size": "600x600"
+                }
+            }
+        }
+    }
+}

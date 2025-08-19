@@ -1,0 +1,30 @@
+{
+  "Banner": {
+    "builder": true,
+    "no_selection": true,
+    "name": "Banner Section",
+    "content": {
+      "images": {
+        "main_image": {
+          "size": "600x800"
+        },
+        "group_image": {
+          "size": "600x800"
+        },
+        "project_image": {
+          "size": "600x800"
+        }
+      },
+      "heading": "text",
+      "subheading": "text",
+      "button_text": "text",
+      "button_url": "text",
+      "search_placeholder": "text",
+      "review_text": "text",
+      "rating": "text"
+    },
+    "element": {
+      "modal": true
+    }
+  }
+}
