@@ -150,7 +150,7 @@
                                                                 <button type="button"
                                                                     class="btn btn-sm btn-outline-primary px-2 py-1 mark-btn"
                                                                     data-student-id="{{ $student->id }}"
-                                                                    data-student-name="{{ $student->name }}"
+                                                                    data-student-name="{{ $student->user->name }}"
                                                                     data-day="{{ $day }}" data-bs-toggle="modal"
                                                                     data-bs-target="#markModal">
                                                                     {{ $day }}
