@@ -135,6 +135,7 @@
                             <div class="col-md-12">
                                 <label class="form-label">Schedule (Select Days)</label><br>
                                 @php
+
                                     $days = [
                                         'Monday',
                                         'Tuesday',
@@ -144,7 +145,16 @@
                                         'Saturday',
                                         'Sunday',
                                     ];
-                                    $selectedDays = old('schedule') ? explode(',', old('schedule')) : [];
+                                    $oldSchedule = old('schedule');
+
+                                    if (is_array($oldSchedule)) {
+                                        $selectedDays = $oldSchedule;
+                                    } elseif (is_string($oldSchedule)) {
+                                        $selectedDays = explode(',', $oldSchedule);
+                                    } else {
+                                        $selectedDays = [];
+                                    }
+                                @endphp
                                 @endphp
                                 @foreach ($days as $day)
                                     <div class="form-check form-check-inline">

@@ -638,7 +638,7 @@
                       data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                       <div class="d-flex align-items-center">
                           <div>
-                              <img src="{{ auth()->user()->profile_image ? asset('uploads/users/' . auth()->user()->profile_image) : asset('/uploads/default.jpg') }}"
+                              <img src="{{ auth()->user()->profile_image ? asset('uploads/profile/' . auth()->user()->profile_image) : asset('/uploads/default.jpg') }}"
                                   alt="img" class="avatar avatar-sm avatar-rounded">
                           </div>
                       </div>

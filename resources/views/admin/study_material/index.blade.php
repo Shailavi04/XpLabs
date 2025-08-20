@@ -38,7 +38,7 @@
                             <th>Description</th>
                             <th>Link/File</th>
                             <th>Status</th>
-                            @if (auth()->user()->role_id == 1 || auth()->user()->role_id == 2)
+                            @if (auth()->user()->role_id == 1 || auth()->user()->role_id == 2 || auth()->user()->role_id == 3)
                                 <th>Actions</th>
                             @endif
                         </tr>
@@ -260,7 +260,7 @@
 
             ];
 
-            if (userRole === 1 || userRole === 2) {
+            if (userRole === 1 || userRole === 2 || userRole === 3) {
                 columns.push({
                     data: 'action',
                     name: 'action',

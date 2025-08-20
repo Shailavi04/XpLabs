@@ -77,14 +77,15 @@ class CategoryController extends Controller
             $row['status'] = $cat->active == 1 ? 'Active' : 'Inactive';
             $row['image'] = $imageHtml;
             $deleteUrl = route('categories.destroy', $cat->id);
-
             $row['action'] = '
 <div class="btn-group">
     <button type="button" class="btn btn-sm btn-warning dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
-        <svg xmlnd="M8 5.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm0 1.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm0 4.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z"/>
+         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 5.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm0 1.5a1.5 1.5 0 1 1 0 3 
+                1.5 1.5 0 0 1 0-3zm0 4.5a1.5 1.5 0 1 1 0 3 
+                1.5 1.5 0 0 1 0-3z"/>
         </svg>
-    </button>s="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-            <path 
+    </button>
     <ul class="dropdown-menu">
         <li>
             <a class="dropdown-item btn-edit" href="javascript:void(0);" data-id="' . $cat->id . '">
@@ -101,6 +102,7 @@ class CategoryController extends Controller
         </li>
     </ul>
 </div>';
+
 
 
 

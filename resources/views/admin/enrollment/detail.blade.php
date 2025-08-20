@@ -75,9 +75,9 @@
 
                         <!-- Row 8 -->
                         <div class="d-flex">
-                            <div class="w-50 text-lightest f-14">Balance Fee:</div>
+                            <div class="w-50 text-lightest f-14">Remaining Fee:</div>
                             <div class="w-50 text-warning fw-semibold">
-                                ₹{{ number_format(($course->amount_due ?? 0) - ($enrollment->amount_due ?? 0)) }}
+                                ₹{{ $payment->amount_due }}
                             </div>
                         </div>
 
@@ -94,12 +94,12 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <span class="d-block text-dark fw-semibold fs-6">Email</span>
-                            <span class="text-muted">{{ $student->email ?? 'N/A' }}</span>
+                            <span class="text-muted">{{ $student->user->email ?? 'N/A' }}</span>
                         </div>
 
                         <div class="mb-3">
                             <span class="d-block text-dark fw-semibold fs-6">Mobile</span>
-                            <span class="text-muted">{{ $student->mobile ?? 'N/A' }}</span>
+                            <span class="text-muted">{{ $student->user->phone_number ?? 'N/A' }}</span>
                         </div>
                     </div>
 

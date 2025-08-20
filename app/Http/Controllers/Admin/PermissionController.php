@@ -15,90 +15,96 @@ class PermissionController extends Controller
         return view('admin.permission.index', compact('modules'));
     }
 
-   public function data(Request $request)
-{
-    $columns = ['id', 'name', 'module_id', 'created_at'];
+    public function data(Request $request)
+    {
+        $columns = ['id', 'name', 'module_id', 'created_at'];
 
-    $draw = $request->get('draw');
-    $start = $request->get('start');
-    $length = $request->get('length');
-    $search = $request->get('search')['value'] ?? '';
+        $draw = $request->get('draw');
+        $start = $request->get('start');
+        $length = $request->get('length');
+        $search = $request->get('search')['value'] ?? '';
 
-    $totalRecords = Permission::count();
+        $totalRecords = Permission::count();
 
-    $query = Permission::with('module');
+        $query = Permission::with('module');
 
-    if (!empty($search)) {
-        $query->where(function ($q) use ($search) {
-            $q->where('name', 'like', "%{$search}%")
-                ->orWhereHas('module', function ($q2) use ($search) {
-                    $q2->where('name', 'like', "%{$search}%");
-                });
-        });
-    }
-
-    $totalFiltered = $query->count();
-
-    if ($request->has('order')) {
-        $orderColumnIndex = $request->get('order')[0]['column'];
-        $orderColumn = $columns[$orderColumnIndex] ?? 'created_at';
-        $orderDir = $request->get('order')[0]['dir'] ?? 'desc';
-
-        // Force descending order for 'id' and 'created_at' columns to show latest first
-        if (in_array($orderColumn, ['id', 'created_at'])) {
-            $orderDir = 'desc';
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhereHas('module', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%");
+                    });
+            });
         }
 
-        $query->orderBy($orderColumn, $orderDir);
-    } else {
-        // Default order: newest first
-        $query->orderBy('created_at', 'desc');
-    }
+        $totalFiltered = $query->count();
 
-    $permissions = $query->offset($start)->limit($length)->get();
+        if ($request->has('order')) {
+            $orderColumnIndex = $request->get('order')[0]['column'];
+            $orderColumn = $columns[$orderColumnIndex] ?? 'created_at';
+            $orderDir = $request->get('order')[0]['dir'] ?? 'desc';
 
-    $data = [];
-    foreach ($permissions as $index => $permission) {
-        $row = [];
-        $row['DT_RowIndex'] = $start + $index + 1;
-        $row['name'] = e($permission->name);
-        $row['module'] = e($permission->module->name ?? 'N/A');
+            // Force descending order for 'id' and 'created_at' columns to show latest first
+            if (in_array($orderColumn, ['id', 'created_at'])) {
+                $orderDir = 'desc';
+            }
 
-        $row['action'] = '
+            $query->orderBy($orderColumn, $orderDir);
+        } else {
+            // Default order: newest first
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $permissions = $query->offset($start)->limit($length)->get();
+
+        $data = [];
+        foreach ($permissions as $index => $permission) {
+            $row = [];
+            $row['DT_RowIndex'] = $start + $index + 1;
+            $row['name'] = e($permission->name);
+            $row['module'] = e($permission->module->name ?? 'N/A');
+
+            $row['action'] = '
         <div class="btn-group">
             <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
-                Actions
-            </button>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 5.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm0 1.5a1.5 1.5 0 1 1 0 3
+                            1.5 1.5 0 0 1 0-3zm0 4.5a1.5 1.5 0 1 1 0 3
+                            1.5 1.5 0 0 1 0-3z" />
+                    </svg>
+                </button>
             <ul class="dropdown-menu">
-                <li>
-                    <a href="javascript:void(0)" 
-                       class="dropdown-item edit-btn" 
-                       data-id="' . $permission->id . '">
-                       <i class="bi bi-pencil-square"></i> Edit
-                    </a>
-                </li>
+               <li>
+            <a href="javascript:void(0)" 
+               class="dropdown-item edit-btn" 
+               data-id="' . $permission->id . '"
+               data-module_id="' . $permission->module_id . '"
+               data-name="' . $permission->name . '">
+               <i class="bi bi-pencil-square text-primary"></i> Edit
+            </a>
+        </li>
                 <li>
                     <form id="delete-form-' . $permission->id . '" action="' . route('permission.destroy', $permission->id) . '" method="POST" style="display: none;">
                         ' . csrf_field() . '
                         ' . method_field('DELETE') . '
                     </form>
                     <a href="javascript:void(0);" class="dropdown-item text-danger" onclick="confirmDelete(' . $permission->id . ')">
-                        <i class="fas fa-trash-alt me-1"></i> Delete
+                            <i class="fas fa-trash-alt me-1"></i> Delete
                     </a>
                 </li>
             </ul>
         </div>';
-        
-        $data[] = $row;
-    }
 
-    return response()->json([
-        "draw" => intval($draw),
-        "recordsTotal" => $totalRecords,
-        "recordsFiltered" => $totalFiltered,
-        "data" => $data,
-    ]);
-}
+            $data[] = $row;
+        }
+
+        return response()->json([
+            "draw" => intval($draw),
+            "recordsTotal" => $totalRecords,
+            "recordsFiltered" => $totalFiltered,
+            "data" => $data,
+        ]);
+    }
 
 
     public function store(Request $request)

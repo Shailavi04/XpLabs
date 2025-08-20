@@ -89,4 +89,8 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Center::class, 'center_user', 'user_id', 'center_id');
     }
+    public function students()
+    {
+        return $this->hasMany(Student::class);
+    }
 }

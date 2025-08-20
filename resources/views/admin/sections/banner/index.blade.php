@@ -92,7 +92,6 @@
         </div>
     </div>
 
-    <!-- Modal of add home banner  -->
     <div class="modal fade" id="addBannerModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -101,13 +100,14 @@
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title">Add Banner</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
+
                     <div class="modal-body">
                         <div class="row g-3">
 
-                            <div class="col-4">
-                                <label class="form-label">Type <span style="color: red;">*</span></label>
+                            <div class="col-md-4">
+                                <label for="type_add" class="form-label">Type <span class="text-danger">*</span></label>
                                 <select name="type" id="type_add" class="form-select" required>
                                     <option value="">Select</option>
                                     <option value="1">Home</option>
@@ -115,58 +115,71 @@
                                 </select>
                             </div>
 
-                            <div class="col-4">
-                                <label class="form-label">Heading <span style="color: red;">*</span></label>
-                                <input type="text" name="heading" id="heading_add" class="form-control" required>
+                            <div class="col-md-4">
+                                <label for="heading_add" class="form-label">Heading <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" name="heading" id="heading_add" class="form-control"
+                                    placeholder="Enter heading" required>
                             </div>
 
-                            <div class="col-4">
-                                <label class="form-label">Subheading <span style="color: red;">*</span></label>
-                                <input type="text" name="subheading" id="subheading_add" class="form-control" required>
+                            <div class="col-md-4">
+                                <label for="subheading_add" class="form-label">Subheading <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" name="subheading" id="subheading_add" class="form-control"
+                                    placeholder="Enter subheading" required>
                             </div>
 
-                            <div class="col-4">
-                                <label class="form-label">Review Title <span style="color: red;">*</span></label>
+                            <div class="col-md-4">
+                                <label for="review_title_add" class="form-label">Review Title <span
+                                        class="text-danger">*</span></label>
                                 <input type="text" name="review_title" id="review_title_add" class="form-control"
-                                    required>
+                                    placeholder="Enter review title" required>
                             </div>
 
-                            <div class="col-4">
-                                <label class="form-label">Rating <span style="color: red;">*</span></label>
-                                <input type="text" name="rating" id="rating_add" class="form-control" required>
+                            <div class="col-md-4">
+                                <label for="rating_add" class="form-label">Rating <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" name="rating" id="rating_add" class="form-control"
+                                    placeholder="Enter rating" required>
                             </div>
 
-                            <div class="col-4">
-                                <label class="form-label">Review Text <span style="color: red;">*</span></label>
+                            <div class="col-md-4">
+                                <label for="review_text_add" class="form-label">Review Text <span
+                                        class="text-danger">*</span></label>
                                 <input type="text" name="review_text" id="review_text_add" class="form-control"
-                                    required>
+                                    placeholder="Enter review text" required>
                             </div>
 
-                            <div class="col-4">
-                                <label class="form-label">Button Text</label>
-                                <input type="text" name="button_text" id="button_text_add" class="form-control">
+                            <div class="col-md-4" id="button_text_wrapper_add">
+                                <label for="button_text_add" class="form-label">Button Text</label>
+                                <input type="text" name="button_text" id="button_text_add" class="form-control"
+                                    placeholder="Enter button text">
                             </div>
 
-                            <div class="col-4">
-                                <label class="form-label">Button URL</label>
-                                <input type="url" name="button_url" id="button_url_add" class="form-control">
+                            <div class="col-md-4" id="button_url_wrapper_add">
+                                <label for="button_url_add" class="form-label">Button URL</label>
+                                <input type="url" name="button_url" id="button_url_add" class="form-control"
+                                    placeholder="Enter button URL">
                             </div>
 
                             <div class="row" id="addImageContainer"></div>
 
-                            <div class="col-12 mt-3">
+                            <div class="col-12 mt-2">
                                 <button type="button" class="btn btn-outline-primary btn-sm" id="addMoreAddImages">
                                     + Add Image
                                 </button>
                             </div>
 
                             <div class="col-12">
-                                <label class="form-label">Description <span style="color: red;">*</span></label>
-                                <textarea name="description" id="description_add" class="form-control" rows="3" required></textarea>
+                                <label for="description_add" class="form-label mt-2">Description <span
+                                        class="text-danger">*</span></label>
+                                <textarea name="description" id="description_add" class="form-control" rows="3"
+                                    placeholder="Enter description" required></textarea>
                             </div>
 
                         </div>
                     </div>
+
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-success">Save</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -176,7 +189,7 @@
         </div>
     </div>
 
-    <!-- Edit Banner Modal -->
+
     <div class="modal fade" id="editBannerModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -186,14 +199,14 @@
 
                     <div class="modal-header">
                         <h5 class="modal-title">Edit Banner</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
                     <div class="modal-body">
                         <div class="row g-3">
 
-                            <div class="col-4">
-                                <label class="form-label">Type</label>
+                            <div class="col-md-4">
+                                <label for="edit_type" class="form-label">Type <span class="text-danger">*</span></label>
                                 <select name="type" id="edit_type" class="form-select" required>
                                     <option value="">Select</option>
                                     <option value="1">Home</option>
@@ -201,53 +214,65 @@
                                 </select>
                             </div>
 
-                            <div class="col-4">
-                                <label class="form-label">Heading</label>
-                                <input type="text" name="heading" id="edit_heading" class="form-control" required>
+                            <div class="col-md-4">
+                                <label for="edit_heading" class="form-label">Heading <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" name="heading" id="edit_heading" class="form-control"
+                                    placeholder="Enter heading" required>
                             </div>
 
-                            <div class="col-4">
-                                <label class="form-label">Subheading</label>
+                            <div class="col-md-4">
+                                <label for="edit_subheading" class="form-label">Subheading <span
+                                        class="text-danger">*</span></label>
                                 <input type="text" name="subheading" id="edit_subheading" class="form-control"
-                                    required>
+                                    placeholder="Enter subheading" required>
                             </div>
 
-                            <div class="col-4">
-                                <label class="form-label">Review Title</label>
-                                <input type="text" name="review_title" id="edit_review_title" class="form-control">
+                            <div class="col-md-4">
+                                <label for="edit_review_title" class="form-label">Review Title <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" name="review_title" id="edit_review_title" class="form-control"
+                                    placeholder="Enter review title" required>
                             </div>
 
-                            <div class="col-4">
-                                <label class="form-label">Rating</label>
-                                <input type="text" name="rating" id="edit_rating" class="form-control">
+                            <div class="col-md-4">
+                                <label for="edit_rating" class="form-label">Rating <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" name="rating" id="edit_rating" class="form-control"
+                                    placeholder="Enter rating" required>
                             </div>
 
-                            <div class="col-4">
-                                <label class="form-label">Review Text</label>
-                                <input type="text" name="review_text" id="edit_review_text" class="form-control">
+                            <div class="col-md-4">
+                                <label for="edit_review_text" class="form-label">Review Text <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" name="review_text" id="edit_review_text" class="form-control"
+                                    placeholder="Enter review text" required>
                             </div>
 
-                            <div class="col-4 d-none" id="edit_button_text_wrapper">
-                                <label class="form-label">Button Text</label>
-                                <input type="text" name="button_text" id="edit_button_text" class="form-control">
+                            <div class="col-md-4 d-none" id="edit_button_text_wrapper">
+                                <label for="edit_button_text" class="form-label">Button Text</label>
+                                <input type="text" name="button_text" id="edit_button_text" class="form-control"
+                                    placeholder="Enter button text">
                             </div>
 
-                            <div class="col-4 d-none" id="edit_button_url_wrapper">
-                                <label class="form-label">Button URL</label>
-                                <input type="url" name="button_url" id="edit_button_url" class="form-control">
+                            <div class="col-md-4 d-none" id="edit_button_url_wrapper">
+                                <label for="edit_button_url" class="form-label">Button URL</label>
+                                <input type="url" name="button_url" id="edit_button_url" class="form-control"
+                                    placeholder="Enter button URL">
                             </div>
 
                             <div class="row" id="editImageContainer"></div>
-
-                            <div class="col-12 mt-3">
+                            <div class="col-12 mt-2">
                                 <button type="button" class="btn btn-outline-primary btn-sm" id="addMoreEditImages">
                                     + Add Image
                                 </button>
                             </div>
 
-                            <div class="col-12">
-                                <label class="form-label">Description</label>
-                                <textarea name="description" id="edit_description" class="form-control" rows="3"></textarea>
+                            <div class="col-12 mt-3">
+                                <label for="edit_description" class="form-label">Description <span
+                                        class="text-danger">*</span></label>
+                                <textarea name="description" id="edit_description" class="form-control" rows="3"
+                                    placeholder="Enter description" required></textarea>
                             </div>
 
                         </div>
@@ -272,15 +297,18 @@
             let addImageIndex = 0;
             let editImageIndex = 0;
 
-            // --- TOGGLE BUTTON TEXT/URL FIELDS BASED ON TYPE ---
             function toggleButtonFields(type, form = 'add') {
+                type = type.toString();
+
                 if (form === 'add') {
                     if (type === '2') {
-                        $('#button_text_add').val('').closest('.col-4').addClass('d-none');
-                        $('#button_url_add').val('').closest('.col-4').addClass('d-none');
+                        $('#button_text_add').val('');
+                        $('#button_url_add').val('');
+                        $('#button_text_wrapper_add').addClass('d-none');
+                        $('#button_url_wrapper_add').addClass('d-none');
                     } else {
-                        $('#button_text_add').closest('.col-4').removeClass('d-none');
-                        $('#button_url_add').closest('.col-4').removeClass('d-none');
+                        $('#button_text_wrapper_add').removeClass('d-none');
+                        $('#button_url_wrapper_add').removeClass('d-none');
                     }
                 } else if (form === 'edit') {
                     if (type === '2') {
@@ -288,57 +316,58 @@
                         $('#edit_button_url').val('');
                         $('#edit_button_text_wrapper').addClass('d-none');
                         $('#edit_button_url_wrapper').addClass('d-none');
-                        $('#addMoreEditImages').hide();
                     } else {
                         $('#edit_button_text_wrapper').removeClass('d-none');
                         $('#edit_button_url_wrapper').removeClass('d-none');
-                        $('#addMoreEditImages').show();
                     }
                 }
             }
 
 
-            // Initial state on load
+            // --- INITIAL STATE ON PAGE LOAD ---
             toggleButtonFields($('#type_add').val());
 
             // --- TYPE CHANGE EVENTS ---
-            $('#type_add').change(function() {
-                toggleButtonFields($(this).val());
+            $('#type_add').on('change', function() {
+                let val = $(this).val();
+                console.log('Add type changed:', val);
+                toggleButtonFields(val, 'add');
             });
 
-            $('#edit_type').change(function() {
-                toggleButtonFields($(this).val());
+            $('#edit_type').on('change', function() {
+                let val = $(this).val();
+                console.log('Edit type changed:', val);
+                toggleButtonFields(val, 'edit');
 
-                if ($(this).val() === '2') {
+                if (val === '2') {
                     $('#editImageContainer').html(`
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Image 1</label>
-                        <input type="file" name="images[0]" class="form-control">
-                    </div>
-                `);
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Image 1</label>
+                    <input type="file" name="images[0]" class="form-control">
+                </div>
+            `);
                     editImageIndex = 1;
                 }
             });
 
-            // --- ADD IMAGE FIELD FOR ADD MODAL ---
-            $('#addMoreAddImages').click(function() {
+            // --- ADD IMAGE FIELDS ---
+            $('#addMoreAddImages').on('click', function() {
                 $('#addImageContainer').append(`
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Image ${addImageIndex + 1}</label>
-                    <input type="file" name="images[${addImageIndex}]" class="form-control">
-                </div>
-            `);
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Image ${addImageIndex + 1}</label>
+                <input type="file" name="images[${addImageIndex}]" class="form-control">
+            </div>
+        `);
                 addImageIndex++;
             });
 
-            // --- ADD IMAGE FIELD FOR EDIT MODAL ---
-            $('#addMoreEditImages').click(function() {
+            $('#addMoreEditImages').on('click', function() {
                 $('#editImageContainer').append(`
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Image ${editImageIndex + 1}</label>
-                    <input type="file" name="images[${editImageIndex}]" class="form-control">
-                </div>
-            `);
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Image ${editImageIndex + 1}</label>
+                <input type="file" name="images[${editImageIndex}]" class="form-control">
+            </div>
+        `);
                 editImageIndex++;
             });
 
@@ -352,19 +381,23 @@
                     success: function(response) {
                         // Fill form fields
                         $('#edit_banner_id').val(response.id);
-                        $('#edit_type').val(response.type).trigger('change');
                         $('#edit_heading').val(response.heading);
                         $('#edit_subheading').val(response.subheading);
                         $('#edit_description').val(response.description);
                         $('#edit_review_title').val(response.review_title);
                         $('#edit_rating').val(response.rating);
                         $('#edit_review_text').val(response.review_text);
-                        $('#edit_button_text').val(response.button_text);
-                        $('#edit_button_url').val(response.button_url);
 
+                        // Set type first and toggle button fields
+                        $('#edit_type').val(response.type);
                         toggleButtonFields(response.type, 'edit');
 
-                        // Reset image container and index
+                        if (response.type !== '2') {
+                            $('#edit_button_text').val(response.button_text);
+                            $('#edit_button_url').val(response.button_url);
+                        }
+
+                        // Reset image container
                         $('#editImageContainer').empty();
                         editImageIndex = 0;
 
@@ -376,40 +409,43 @@
                         }
 
                         if (response.type === '2') {
-                            // Only one image allowed for success type
                             const imgPath = images.length > 0 ? images[0] : null;
                             $('#editImageContainer').append(`
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Image 1</label>
-                                <input type="file" name="images[0]" class="form-control">
-                                ${imgPath ? `<div class="mt-2"><img src="/${imgPath}" class="img-thumbnail" style="max-height: 100px;"></div>` : ''}
-                            </div>
-                        `);
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Image 1</label>
+                            <input type="file" name="images[0]" class="form-control">
+                            ${imgPath ? `<div class="mt-2"><img src="/${imgPath}" class="img-thumbnail" style="max-height: 100px;"></div>` : ''}
+                        </div>
+                    `);
                             editImageIndex = 1;
                         } else {
                             if (images.length > 0) {
                                 images.forEach((imgPath, index) => {
                                     $('#editImageContainer').append(`
-                                    <div class="col-md-4 mb-3">
-                                        <label class="form-label">Image ${index + 1}</label>
-                                        <input type="file" name="images[${index}]" class="form-control">
-                                        <div class="mt-2">
-                                            <img src="/${imgPath}" class="img-thumbnail" style="max-height: 100px;">
-                                        </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Image ${index + 1}</label>
+                                    <input type="file" name="images[${index}]" class="form-control">
+                                    <div class="mt-2">
+                                        <img src="/${imgPath}" class="img-thumbnail" style="max-height: 100px;">
                                     </div>
-                                `);
+                                </div>
+                            `);
                                     editImageIndex++;
                                 });
                             } else {
                                 $('#editImageContainer').append(`
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">Image 1</label>
-                                    <input type="file" name="images[0]" class="form-control">
-                                </div>
-                            `);
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Image 1</label>
+                                <input type="file" name="images[0]" class="form-control">
+                            </div>
+                        `);
                                 editImageIndex = 1;
                             }
                         }
+
+                        $('#editBannerForm').attr('action', '/website_frontend/banner/update/' +
+                            id);
+
 
                         $('#editBannerModal').modal('show');
                     },
@@ -418,6 +454,7 @@
                     }
                 });
             });
+
         });
     </script>
 @endpush

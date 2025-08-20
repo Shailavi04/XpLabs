@@ -20,7 +20,8 @@ class AssignmentController extends Controller
             $courses = Course::all();
             $batches = ModelsBatch::all();
             $assignments = Assignment::with(['batch', 'creator'])->get();
-        } else {
+
+        } elseif ($user->role_id == 2) {
             $userCenterIds = DB::table('center_user')
                 ->where('user_id', $user->id)
                 ->pluck('center_id')
@@ -37,13 +38,42 @@ class AssignmentController extends Controller
             $assignments = Assignment::with(['batch', 'creator'])
                 ->whereIn('batch_id', $batches->pluck('id')->toArray())
                 ->get();
+        } elseif ($user->role_id == 3) {
+            $batches = ModelsBatch::where('instructor_id', $user->id)->get();
+            $courses = Course::whereIn('id', $batches->pluck('course_id'))->get();
+
+            $assignments = Assignment::with(['batch', 'creator'])
+                ->whereIn('batch_id', $batches->pluck('id')->toArray())
+                ->get();
+        } elseif ($user->role_id == 4) {
+            $student = DB::table('students')->where('user_id', $user->id)->first();
+
+            if ($student) {
+                $batchIds = DB::table('enrollment')
+                    ->where('student_id', $student->id)
+                    ->where('status', 2) 
+                    ->pluck('batch_id')
+                    ->toArray();
+
+                $batches = ModelsBatch::whereIn('id', $batchIds)->get();
+                $courses = Course::whereIn('id', $batches->pluck('course_id'))->get();
+
+                $assignments = Assignment::with(['batch', 'creator'])
+                    ->whereIn('batch_id', $batchIds)
+                    ->get();
+            } else {
+                $batches = collect();
+                $courses = collect();
+                $assignments = collect();
+            }
+        } else {
+            $courses = collect();
+            $batches = collect();
+            $assignments = collect();
         }
 
         return view('admin.assignment.index', compact('courses', 'batches', 'assignments'));
     }
-
-
-
 
 
 
@@ -58,11 +88,36 @@ class AssignmentController extends Controller
 
         $query = Assignment::with(['batch', 'batch.course', 'creator']);
 
-        $student = DB::table('students')->where('user_id', $user->id)->first();
+
+
+        if ($user->role_id == 4) {
+
+            $student = DB::table('students')->where('user_id', $user->id)->first();
+
+            if (!$student) {
+
+
+                return response()->json([
+                    'draw' => intval($draw),
+                    'recordsTotal' => 0,
+                    'recordsFiltered' => 0,
+                    'data' => [],
+                    'error' => 'Student not found for this user.',
+                ]);
+            }
+
+            $activeEnrollments = DB::table('enrollment')
+                ->where('student_id', $student->id)
+                ->where('status', 2)
+                ->pluck('course_id');
+
+            $query->whereHas('batch.course', function ($q) use ($activeEnrollments) {
+                $q->whereIn('id', $activeEnrollments);
+            });
+        }
 
 
         if ($user->role_id == 1) {
-            // Admin – can see all assignments (no additional filters)
         } elseif ($user->role_id == 2) {
             $userCenterIds = DB::table('center_user')
                 ->where('user_id', $user->id)
@@ -88,7 +143,12 @@ class AssignmentController extends Controller
             $query->whereHas('batch.course', function ($q) use ($activeEnrollments) {
                 $q->whereIn('id', $activeEnrollments);
             });
+        } elseif ($user->role_id == 3) {
+            $query->whereHas('batch', function ($q) use ($user) {
+                $q->where('instructor_id', $user->id);
+            });
         }
+
 
 
         $totalRecords = $query->count();
@@ -133,7 +193,7 @@ class AssignmentController extends Controller
             </button>
             <ul class="dropdown-menu">';
 
-            if ($user->role_id == 1 || $user->role_id == 2) {
+            if ($user->role_id == 1 || $user->role_id == 2 || $user->role_id == 3) {
                 $deleteUrl = route('assignment.destroy', $assignment->id);
                 $actions .= '
             <li>

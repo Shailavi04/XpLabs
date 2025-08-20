@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\StudyMaterial;
 use App\Models\Batch;
+use App\Models\Course;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -13,34 +14,30 @@ use Illuminate\Support\Str;
 
 class Studymaterialcontroller extends Controller
 {
-    public function index()
-    {
-        $user = auth()->user();
-        $userId = $user->id;
+   public function index()
+{
+    $user = auth()->user();
 
-        if ($user->role_id == 1) {
-            $courses = DB::table('courses')->get();
-            $batches = Batch::all();
-        } else {
-            $userCenterIds = DB::table('center_user')
-                ->where('user_id', $userId)
-                ->pluck('center_id')
-                ->toArray();
-
-            $courseIds = DB::table('center_course')
-                ->whereIn('center_id', $userCenterIds)
-                ->pluck('course_id')
-                ->toArray();
-
-            $courses = DB::table('courses')
-                ->whereIn('id', $courseIds)
-                ->get();
-
-            $batches = Batch::whereIn('course_id', $courseIds)->get();
-        }
-
-        return view('admin.study_material.index', compact('courses', 'batches'));
+    if ($user->role_id == 1) {
+        $courses = Course::all();
+        $batches = Batch::all();
+    } elseif ($user->role_id == 2) {
+        $centerIds = DB::table('center_user')->where('user_id', $user->id)->pluck('center_id');
+        $courseIds = DB::table('center_course')->whereIn('center_id', $centerIds)->pluck('course_id');
+        $courses = Course::whereIn('id', $courseIds)->get();
+        $batches = Batch::whereIn('course_id', $courseIds)->get();
+    } elseif ($user->role_id == 3) {
+        $batches = Batch::where('instructor_id', $user->id)->get();
+        $courseIds = $batches->pluck('course_id')->unique();
+        $courses = Course::whereIn('id', $courseIds)->get();
+    } else {
+        $courses = collect();
+        $batches = collect();
     }
+
+    return view('admin.study_material.index', compact('courses', 'batches'));
+}
+
 
 
     public function data(Request $request)

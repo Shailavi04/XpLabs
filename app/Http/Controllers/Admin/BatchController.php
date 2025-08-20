@@ -135,23 +135,29 @@ class BatchController extends Controller
 
             $row['action'] = '
         <div class="btn-group">
-            <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                Actions
-            </button>
+            <button type="button" class="btn btn-sm btn-primary dropdown-toggle" 
+        data-bs-toggle="dropdown" aria-expanded="false" 
+        style="padding: 0.25rem 0.5rem;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 5.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm0 1.5a1.5 1.5 0 1 1 0 3 
+                1.5 1.5 0 0 1 0-3zm0 4.5a1.5 1.5 0 1 1 0 3 
+                1.5 1.5 0 0 1 0-3z"/>
+        </svg>
+    </button>
             <ul class="dropdown-menu">
                 <li><a href="javascript:void(0);" 
 class="dropdown-item edit-btn" 
 data-id="' . $batch->id . '" 
 data-bs-toggle="modal" 
 data-bs-target="#editBatchModal">
-<i class="fas fa-edit me-1"></i> Edit
+               <i class="fas fa-edit me-1 text-primary"></i> Edit
 </a></li>
                 <li>
                     <form id="delete-form-' . $batch->id . '" action="' . $deleteUrl . '" method="POST" style="display:none;">
                         ' . csrf_field() . method_field('DELETE') . '
                     </form>
-                    <a href="javascript:void(0);" class="dropdown-item text-danger" onclick="if(confirm(\'Are you sure?\')) { document.getElementById(\'delete-form-' . $batch->id . '\').submit(); }">
-                        <i class="fas fa-trash-alt me-1"></i> Delete
+                    <a href="javascript:void(0);" class="dropdown-item text-danger" onclick="confirmDelete(' . $batch->id . ')">
+                <i class="fas fa-trash-alt me-1"></i> Delete
                     </a>
                 </li>
             </ul>
@@ -180,8 +186,6 @@ data-bs-target="#editBatchModal">
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'course_id' => 'required|exists:courses,id',
-            'instructor_id' => 'nullable|exists:users,id',
             'start_date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'schedule' => 'nullable|array',
@@ -190,10 +194,13 @@ data-bs-target="#editBatchModal">
 
         $batch = Batch::findOrFail($id);
 
-        $data = $request->all();
-        $data['schedule'] = isset($data['schedule']) ? implode(',', $data['schedule']) : null;
+        // Only update relevant fields
+        $batch->name = $request->name;
+        $batch->start_date = $request->start_date;
+        $batch->end_date = $request->end_date;
+        $batch->schedule = $request->filled('schedule') ? implode(',', $request->schedule) : null;
 
-        $batch->update($data);
+        $batch->save();
 
         return redirect()->back()->with('success', 'Batch updated successfully.');
     }

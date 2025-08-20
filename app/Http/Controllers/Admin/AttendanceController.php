@@ -40,6 +40,7 @@ class AttendanceController extends Controller
 
         $batches = batch::get();
         $students = Student::with('user')->get();
+        // dd($students);
 
         return view('admin.attendance.create', compact('batches', 'students', 'attendances','pastDays'));
     }

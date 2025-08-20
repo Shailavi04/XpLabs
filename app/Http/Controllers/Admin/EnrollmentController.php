@@ -11,6 +11,7 @@ use App\Models\Payment;
 use App\Models\Student;
 use App\Models\Transaction;
 use App\Models\Transactions;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Code;
@@ -369,9 +370,9 @@ class EnrollmentController extends Controller
 
     public function lifecycle()
     {
-
         return view('admin.enrollment.lifecycle');
     }
+
     public function lifecycleData(Request $request)
     {
         $draw = $request->get('draw');
@@ -379,58 +380,54 @@ class EnrollmentController extends Controller
         $length = $request->get('length');
         $searchValue = $request->get('search')['value'] ?? null;
 
-        $baseQuery = Enrollment::select('enrollment.*')
-            ->selectRaw("(SELECT MAX(changed_at) FROM enrollment_status_logs WHERE enrollment_id = enrollment.id AND status = 3) AS latest_completed")
-            ->selectRaw("(SELECT MAX(changed_at) FROM enrollment_status_logs WHERE enrollment_id = enrollment.id AND status = 4) AS latest_dropped")
-            ->with(['student', 'course']);
+        // Base query using JOINs
+        $baseQuery = DB::table('enrollment')
+            ->select(
+                'enrollment.*',
+                'students.id as student_id',
+                'students.icard',
+                'enrollment.created_at as created_at',
+                'courses.name as course_name',
+                'users.name as student_name', // Fetching student name from users table
+                DB::raw("(SELECT MAX(changed_at) FROM enrollment_status_logs WHERE enrollment_id = enrollment.id AND status = 3) AS latest_completed"),
+                DB::raw("(SELECT MAX(changed_at) FROM enrollment_status_logs WHERE enrollment_id = enrollment.id AND status = 4) AS latest_dropped")
+            )
+            ->leftJoin('students', 'students.icard', '=', 'enrollment.student_icard')
+            ->leftJoin('courses', 'courses.id', '=', 'enrollment.course_id')
+            ->leftJoin('users', 'users.id', '=', 'students.user_id'); // Joining users table to get student names
 
+        // Search filter
         if (!empty($searchValue)) {
-            $baseQuery->whereHas('student', function ($q) use ($searchValue) {
-                $q->where('name', 'like', "%$searchValue%");
-            })->orWhereHas('course', function ($q) use ($searchValue) {
-                $q->where('name', 'like', "%$searchValue%");
+            $baseQuery->where(function ($query) use ($searchValue) {
+                $query->where('users.name', 'like', "%$searchValue%")
+                    ->orWhere('courses.name', 'like', "%$searchValue%");
             });
         }
 
+        // Count before pagination
         $totalRecords = $baseQuery->count();
         $totalFiltered = $totalRecords;
 
+        // Apply pagination
         $enrollments = $baseQuery->offset($start)
             ->limit($length)
             ->orderByDesc('enrollment.created_at')
             ->get();
 
+        // Format data for DataTable
         $data = [];
         $i = $start + 1;
 
         foreach ($enrollments as $enrollment) {
-
             $viewUrl = route('enrollment.show', $enrollment->id);
-            $row = [];
 
+            $row = [];
             $row['id'] = $enrollment->id;
-            $row['status_code'] = $enrollment->status;
             $row['DT_RowIndex'] = $i++;
-            $row['student'] = $enrollment->student->name ?? '-';
-            $row['course'] = $enrollment->course->name ?? '-';
+            $row['status_code'] = $enrollment->status;
+            $row['student'] = $enrollment->student_name ?? '-'; // Using the student name from the users table
+            $row['course'] = $enrollment->course_name ?? '-';
             $row['amount'] = '₹' . number_format($enrollment->token_amount, 2);
-            $row['action'] =  '<div class="btn-group">
-                    <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
-                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M8 5.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm0 1.5a1.5 1.5 0 1 1 0 3 
-                        1.5 1.5 0 0 1 0-3zm0 4.5a1.5 1.5 0 1 1 0 3 
-                        1.5 1.5 0 0 1 0-3z"/>
-                </svg>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a href="' . $viewUrl . '" class="dropdown-item">
-                        <i class="fas fa-eye text-info me-1"></i> View
-                    </a>
-                        </li>
-                        
-                    </ul>
-                </div>';
 
             $statusText = [
                 1 => 'Pending',
@@ -441,17 +438,32 @@ class EnrollmentController extends Controller
 
             $row['status'] = $statusText;
 
-            $row['start_date'] = optional($enrollment->created_at)->format('d M Y') ?? '-';
-            $row['completion_date'] = $enrollment->latest_completed ? \Carbon\Carbon::parse($enrollment->latest_completed)->format('d M Y') : '-';
-            $row['dropped_date'] = $enrollment->latest_dropped ? \Carbon\Carbon::parse($enrollment->latest_dropped)->format('d M Y') : '-';
+            $row['start_date'] = $enrollment->created_at
+                ? \Carbon\Carbon::parse($enrollment->created_at)->format('d M Y')
+                : '-';
+            $row['completion_date'] = $enrollment->latest_completed
+                ? \Carbon\Carbon::parse($enrollment->latest_completed)->format('d M Y')
+                : '-';
+            $row['dropped_date'] = $enrollment->latest_dropped
+                ? \Carbon\Carbon::parse($enrollment->latest_dropped)->format('d M Y')
+                : '-';
 
-
-            $row['status_date'] = match ($enrollment->status) {
-                2 => $row['start_date'],
-                3 => $row['completion_date'],
-                4 => $row['dropped_date'],
-                default => $row['start_date']
-            };
+            $row['action'] = '<div class="btn-group">
+            <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 5.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm0 1.5a1.5 1.5 0 1 1 0 3 
+                        1.5 1.5 0 0 1 0-3zm0 4.5a1.5 1.5 0 1 1 0 3 
+                        1.5 1.5 0 0 1 0-3z"/>
+                </svg>
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a href="' . $viewUrl . '" class="dropdown-item">
+                        <i class="fas fa-eye text-info me-1"></i> View
+                    </a>
+                </li>
+            </ul>
+        </div>';
 
             $data[] = $row;
         }
@@ -463,6 +475,8 @@ class EnrollmentController extends Controller
             'data' => $data
         ]);
     }
+
+
 
 
     public function updateStatus(Request $request)
@@ -505,7 +519,8 @@ class EnrollmentController extends Controller
             return abort(404, 'Enrollment not found');
         }
 
-        $student = Student::find($enrollment->student_id);
+        $student = Student::with('user')->find($enrollment->student_id);
+
 
         $course = Course::find($enrollment->course_id);
 

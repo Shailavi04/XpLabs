@@ -53,7 +53,7 @@ class ClassesController extends Controller
         //     Log::info("No profile image uploaded.");
         // }
 
-        
+
 
         classes::create([
             'name' => $request->name,
@@ -115,7 +115,14 @@ class ClassesController extends Controller
         $data = [];
         $i = $start + 1;
 
+
+
         foreach ($users as $user) {
+
+          
+
+            
+
             $row = [];
             $row['DT_RowIndex'] = $i++;
             $row['name'] = $user->name;

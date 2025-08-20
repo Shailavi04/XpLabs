@@ -7,6 +7,8 @@ use App\Models\batch;
 use App\Models\center;
 use App\Models\Course;
 use App\Models\Role;
+use App\Models\Student;
+use App\Models\students_instructor;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,7 +30,16 @@ class UserControlller extends Controller
     {
         $user = User::with('centers')->findOrFail($id);
 
-        return view('admin.user.profile', compact('user'));
+        $instructor = null;
+        $student = null;
+
+        if ($user->role_id == 3) {
+            $instructor = students_instructor::where('user_id', $user->id)->first();
+        } elseif ($user->role_id == 4) {
+            $student = Student::where('user_id', $user->id)->first();
+        }
+
+        return view('admin.user.profile', compact('user', 'instructor', 'student'));
     }
 
 
@@ -204,10 +215,10 @@ class UserControlller extends Controller
         if ($request->hasFile('profile_image')) {
             $file = $request->file('profile_image');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/users'), $filename);
+            $file->move(public_path('uploads/profile'), $filename);
 
-            if ($user->profile_image && file_exists(public_path('uploads/users/' . $user->profile_image))) {
-                unlink(public_path('uploads/users/' . $user->profile_image));
+            if ($user->profile_image && file_exists(public_path('uploads/profile/' . $user->profile_image))) {
+                unlink(public_path('uploads/profile/' . $user->profile_image));
             }
 
             $user->profile_image = $filename;
@@ -238,7 +249,7 @@ class UserControlller extends Controller
 
 
         if ($request->filled('password')) {
-            $user->password = bcrypt($request->password);
+            $user->password = Hash::make($request->password);
         }
 
         $imageName = '';
@@ -246,7 +257,7 @@ class UserControlller extends Controller
         if ($request->hasFile('profile_image')) {
             $image = $request->file('profile_image');
             $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('uploads/user'), $imageName);
+            $image->move(public_path('uploads/profile'), $imageName);
             $user->profile_image = $imageName;
         }
 
@@ -334,6 +345,32 @@ class UserControlller extends Controller
                 ->whereIn('center_id', $centerIds)
                 ->count();
         } elseif ($user->role_id == 3) {
+            // Teacher: see only their own courses and batches
+            // Batches assigned to this teacher
+            $batches = Batch::where('instructor_id', $user->id)->count();
+
+            // Courses corresponding to these batches
+            $courseIds = Batch::where('instructor_id', $user->id)->pluck('course_id')->unique();
+            $courses = Course::whereIn('id', $courseIds)->count();
+
+            // Students enrolled in these batches
+            $students = DB::table('enrollment')
+                ->whereIn('course_id', function ($q) use ($user) {
+                    $q->select('course_id')
+                        ->from('batches')
+                        ->where('instructor_id', $user->id);
+                })
+                ->distinct('student_id')
+                ->count('student_id');
+
+
+            $assignments = DB::table('assignments')
+                ->whereIn('batch_id', function ($q) use ($user) {
+                    $q->select('id')
+                        ->from('batches')
+                        ->where('instructor_id', $user->id);
+                })
+                ->count();
         } elseif ($user->role_id == 4) {
             $courses = DB::table('enrollment')
                 ->whereIn('student_id', function ($q) use ($user) {

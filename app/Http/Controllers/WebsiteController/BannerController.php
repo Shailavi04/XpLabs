@@ -63,33 +63,53 @@ class BannerController extends Controller
 
 
     public function edit($id)
-{
-    $banner = Banner::findOrFail($id);
-    $banner->images = json_decode($banner->images, true); // decode to associative array
-    return response()->json($banner);
-}
+    {
+        $banner = Banner::findOrFail($id);
+        $banner->images = json_decode($banner->images, true); // decode to associative array
+        return response()->json($banner);
+    }
 
 
     public function update(Request $request, $id)
     {
         $banner = Banner::findOrFail($id);
-        $data = $this->validateData($request);
 
-        $existingImages = is_array($banner->images) ? $banner->images : json_decode($banner->images, true);
+        $request->validate([
+            'type' => 'required|integer|in:1,2',
+            'heading' => 'required|string|max:255',
+            'subheading' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'review_title' => 'nullable|string|max:255',
+            'rating' => 'nullable|string|max:10',
+            'review_text' => 'nullable|string|max:255',
+            'button_text' => 'nullable|string|max:255',
+            'button_url' => 'nullable|url|max:255',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+        ]);
+
+        // Existing images from DB
+        $existingImages = is_string($banner->images) ? json_decode($banner->images, true) : $banner->images;
+        $existingImages = is_array($existingImages) ? $existingImages : [];
+
+        // Handle new uploaded images
         $images = $this->handleImages($request, $existingImages);
 
-        if (!empty($images)) {
-            $data['images'] = json_encode($images);
-        }
-
-        if ($request->has('course_cards')) {
-            $data['course_cards'] = json_encode($request->course_cards);
-        }
-
-        $banner->update($data);
+        $banner->update([
+            'type' => $request->type,
+            'heading' => $request->heading,
+            'subheading' => $request->subheading,
+            'description' => $request->description,
+            'review_title' => $request->review_title,
+            'rating' => $request->rating,
+            'review_text' => $request->review_text,
+            'button_text' => $request->type != 2 ? $request->button_text : null, // hide if type 2
+            'button_url' => $request->type != 2 ? $request->button_url : null,   // hide if type 2
+            'images' => !empty($images) ? json_encode($images, JSON_UNESCAPED_SLASHES) : null,
+        ]);
 
         return back()->with('success', 'Banner updated successfully.');
     }
+
 
     public function destroy($id)
     {

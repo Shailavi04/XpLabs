@@ -35,18 +35,18 @@ class FrontendController extends Controller
         $key = strtolower(trim(preg_replace('/\s+/', ' ', $key)));
 
         $controllerMap = [
-            'banner section' => BannerController::class,
-            'vision section' => VisionController::class,
-            'about us section' => AboutusController::class,
-            'professional section' => ProfessionalController::class,
-            'why choose us section' => WhyChooseUsController::class,
-            'instructor section' => InstructorController::class,
-            'companies section' => CompaniesController::class,
-            'certificate section' => CertificateController::class,
-            'join section' => JoinCommunityController::class,
-            'testimonial section' => TestimonialController::class,
-            'contact us section' => ContactUsController::class,
-            'faq section' => FAQController::class,
+            'banner' => BannerController::class,
+            'vision' => VisionController::class,
+            'about-us' => AboutusController::class,
+            'professional' => ProfessionalController::class,
+            'why-choose-us' => WhyChooseUsController::class,
+            'instructor' => InstructorController::class,
+            'companies' => CompaniesController::class,
+            'certificate' => CertificateController::class,
+            'join' => JoinCommunityController::class,
+            'testimonial' => TestimonialController::class,
+            'contact-us' => ContactUsController::class,
+            'faq' => FAQController::class,
         ];
 
         if (isset($controllerMap[$key])) {

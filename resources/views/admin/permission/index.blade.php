@@ -168,48 +168,32 @@
 
             // Open Edit modal
             $(document).on('click', '.edit-btn', function() {
-                let id = $(this).data('id'); // Role or Permission id
+                var id = $(this).data('id');
+                var module_id = $(this).data('module_id');
+                var name = $(this).data('name');
 
-                $.ajax({
-                    url: '/permission/edit/' + id, // Change to your edit route
-                    type: 'GET',
-                    success: function(response) {
-                        // response = { role: {...}, modules: [...] } or { permission: {...}, modules: [...] }
+                // Populate modal fields
+                $('#edit_permission_id').val(id);
+                $('#module_id_edit').val(module_id);
+                $('#name_edit').val(name);
 
-                        // Example if editing a Permission:
-                        let permission = response.permission || response
-                        .role; // adapt accordingly
-                        let modules = response.modules;
+                // Set form action dynamically (POST)
+                $('#editPermissionForm').attr('action', '/permission/update/' + id);
+                $('#editPermissionForm').attr('method', 'POST');
 
-                        // Set the form inputs
-                        $('#edit_permission_id').val(permission.id);
-                        $('#name_edit').val(permission.name);
+                // Optional: Add hidden _method input if your route expects PUT/PATCH
+                if ($('#editPermissionForm input[name="_method"]').length === 0) {
+                    $('#editPermissionForm').append('<input type="hidden" name="_method" value="POST">');
+                } else {
+                    $('#editPermissionForm input[name="_method"]').val('POST');
+                }
 
-                        // Populate module select with options, set selected module_id
-                        let moduleSelect = $('#module_id_edit');
-                        moduleSelect.empty();
+                // Show modal
+                var editModal = new bootstrap.Modal(document.getElementById('editPermissionModal'));
+                editModal.show();
+            });
 
-                        moduleSelect.append('<option disabled>Select Module</option>');
 
-                        $.each(modules, function(index, mod) {
-                            let selected = mod.id === permission.module_id ?
-                                'selected' : '';
-                            moduleSelect.append('<option value="' + mod.id + '" ' +
-                                selected + '>' + mod.module.name + '</option>');
-                        });
-
-                        // Set the form action URL dynamically (update route)
-                        $('#editPermissionForm').attr('action', '/permission/update/' +
-                            permission.id);
-
-                        // Show modal
-                        $('#editPermissionModal').modal('show');
-                    },
-                    error: function() {
-                        alert('Error fetching data.');
-                    }
-                });
-            });;
 
 
         });

@@ -40,6 +40,6 @@
     </script>
 
     <script src="https://maps.googleapis.com/maps/api/js?key=
-    AIzaSyAl_E6ajlHryI0jSHJZndgfesVgswAWOrI
-    &callback=initMap" async defer></script>
+    AIzaSyBmPoXd0Wi73kdz3oXwLIIYO-swnnz-zcw 
+        &callback=initMap" async defer></script>
 @endpush

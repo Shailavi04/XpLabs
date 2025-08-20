@@ -108,7 +108,7 @@ class AssignmentSubmissionController extends Controller
             $row['assignment'] = $submission->assignment->title ?? '-';
             $row['comments'] = $submission->comments ?? '-';
             $row['status'] = $submission->status == 0 ? 'Submitted' : 'Graded';
-            $row['file'] = $user->role_id == 1 || $user->role_id == 2 ? $fileLink : 'N/A';
+            $row['file'] = $user->role_id == 1 || $user->role_id == 2 || $user->role_id == 3? $fileLink : 'N/A';
             $row['submitted_at'] = $submission->created_at->format('Y-m-d H:i');
 
             

@@ -138,8 +138,6 @@ class AnnoucementController extends Controller
 
         $allRecipientUsers = $allRecipientUsers->merge($users);
 
-        // Fire event immediately for this announcement
-        event(new AnnouncementCreated($announcement, $users->pluck('id')->toArray()));
     }
 
     return redirect()->back()->with('success', 'Announcement created successfully.');
